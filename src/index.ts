@@ -1,15 +1,29 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
-import { databaseConnection } from "./database";
+import morgan from "morgan";
 
-dotenv.config();
-const PORT = process.env.PORT ?? 5000;
+import routeMiddlewares from "./middlewares/routeMiddlewares";
+import errorMiddlewareAfterRoute from "./middlewares/errorMiddlewares";
 
 const app: Express = express();
 
-// connection to database
-databaseConnection();
+// load environment variables
+dotenv.config();
+
+// port definition
+const PORT = process.env.port ?? 5000;
+
+// express middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan("dev"));
+
+// route middlewares
+routeMiddlewares(app);
+
+// error handling middlewares
+app.use(errorMiddlewareAfterRoute);
 
 app.listen(PORT, () => {
-  console.log(`server started on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
