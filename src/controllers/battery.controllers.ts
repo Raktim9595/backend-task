@@ -43,15 +43,8 @@ async function getallBatteries(
     },
     next
   );
-  const foundBatteries: IMultipleBatteryResponse = {
-    content:
-      batteries?.map((battery) => ({
-        ...battery,
-        averageWatt: calculateAverageBattery(battery.totalWatt),
-      })) ?? [],
-  };
   if (batteries) {
-    return res.status(200).json(foundBatteries);
+    return res.status(200).json(batteries);
   }
 }
 

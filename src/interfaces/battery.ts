@@ -18,8 +18,8 @@ export interface IPostOneBatteryReq extends Request {
 
 export interface IGetAllBatteries extends Request {
   body: {
-    pageNumber: string;
-    pageSize: string;
+    pageNumber: number;
+    pageSize: number;
     filter: Filter;
   };
 }
@@ -36,4 +36,8 @@ export type IMultipleBatteryResponse = {
       averageWatt: number;
     }
   >;
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  numberOfElementsInPage: number;
 };

@@ -5,8 +5,8 @@ export const generateFilters = (filter: Filter) => {
   if (filter.key) {
     filterObject = {
       [filter.key]: {
-        gte: filter.value.value_from ?? "",
-        lte: filter.value.value_to ?? "",
+        gte: parseInt(filter.value.value_from),
+        lte: parseInt(filter.value.value_to),
       },
     };
   }

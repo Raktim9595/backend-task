@@ -3,6 +3,7 @@ import error from "../error/errorTypes";
 import { NextFunction } from "express";
 import { IGetAllServicesProps } from "../interfaces/pagination";
 import { getPaginationParameters } from "../utils/pagination";
+import { generateAllBatteriesRes } from "../utils/generateAllBateriesRes";
 
 const prisma = new PrismaClient();
 
@@ -21,7 +22,6 @@ async function findById(id: string, next: NextFunction) {
 }
 
 async function findAll(props: IGetAllServicesProps, next: NextFunction) {
-  console.log({ offset: props.pageNumber, limit: props.pageSize });
   const { skip, take } = getPaginationParameters({
     pageNumber: props.pageNumber,
     pageSize: props.pageSize,
@@ -35,7 +35,15 @@ async function findAll(props: IGetAllServicesProps, next: NextFunction) {
       skip,
       take,
     });
-    return allBatteries;
+    if (!allBatteries) throw new error.API404Error("no any battery not found");
+
+    const allBatteriesResponse = generateAllBatteriesRes({
+      allBatteries,
+      pageNumber: Number(props.pageNumber),
+      pageSize: Number(props.pageSize),
+      totalElements: await prisma.battery.count(),
+    });
+    return allBatteriesResponse;
   } catch (err) {
     next(err);
   }

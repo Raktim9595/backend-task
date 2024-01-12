@@ -14,5 +14,5 @@ model Battery {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
   totalWatt Int
-  postCode String
+  postCode Int
 }
