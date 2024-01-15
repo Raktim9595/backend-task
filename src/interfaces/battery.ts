@@ -9,11 +9,11 @@ export interface IGetBatteryId extends Request {
 }
 
 export interface IPostMultipleBatteriesReq extends Request {
-  body: Array<Battery>;
+  body: Array<Omit<Battery, "id">>;
 }
 
 export interface IPostOneBatteryReq extends Request {
-  body: Battery;
+  body: Omit<Battery, "id">;
 }
 
 export interface IGetAllBatteries extends Request {
@@ -41,3 +41,9 @@ export type IMultipleBatteryResponse = {
   totalElements: number;
   numberOfElementsInPage: number;
 };
+
+export interface IBatteriesReq {
+  name: string;
+  postCode: string;
+  totalWatt: string;
+}
