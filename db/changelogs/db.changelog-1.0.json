@@ -1,0 +1,25 @@
+{
+  "databaseChangeLog": [
+    {
+      "changeSet": {
+        "id": "7",
+        "author": "Raktim",
+        "comment": "create array of batteries comment",
+        "changes": [
+          {
+            "insertOne": {
+              "collectionName": "Battery",
+              "document": "{\"name\": \"Battery One\", \"postCode\": 1020, \"totalWatt\": 400}"
+            }
+          },
+          {
+            "insertOne": {
+              "collectionName": "Battery",
+              "document": "{\"name\": \"Battery Two\", \"postCode\": 1030, \"totalWatt\": 500}"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

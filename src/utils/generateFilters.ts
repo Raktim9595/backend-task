@@ -1,6 +1,6 @@
-import { Filter } from "../interfaces/filters";
+import { IFilter } from "../interfaces/filters";
 
-export const generateFilters = (filter: Filter) => {
+export const generateFilters = (filter: IFilter<"BETWEEN">) => {
   let filterObject = {};
   if (filter.key) {
     filterObject = {

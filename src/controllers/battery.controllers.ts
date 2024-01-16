@@ -104,6 +104,7 @@ async function postOneBattery(
 ) {
   try {
     const battery = req.body;
+    console.log(battery);
     const createdBattery = await BatteryService.createOne(battery);
     return res.status(StatusCodes.CREATED).json({ createdBattery });
   } catch (err) {
