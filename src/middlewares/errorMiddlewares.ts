@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Prisma } from "@prisma/client";
 import { HttpError } from "http-errors";
+import { StatusCodes } from "http-status-codes";
 
 function errorMiddlewareAfterRoute(
   err: unknown,
@@ -18,17 +19,28 @@ function errorMiddlewareAfterRoute(
     });
   }
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    return res.status(500).json({ error: err.meta });
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      error: {
+        status: StatusCodes.INTERNAL_SERVER_ERROR,
+        message: err.meta?.cause || err.message,
+      },
+    });
   }
   if (err instanceof Prisma.PrismaClientUnknownRequestError) {
-    return res.status(500).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       error: {
+        status: StatusCodes.INTERNAL_SERVER_ERROR,
         message: err.message,
       },
     });
   }
   const error = err as { message: string };
-  return res.status(500).json({ error: { message: error.message } });
+  return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    error: {
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      message: error.message,
+    },
+  });
 }
 
 export default errorMiddlewareAfterRoute;

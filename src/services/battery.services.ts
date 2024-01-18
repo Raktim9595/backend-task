@@ -1,15 +1,15 @@
-import { Battery, PrismaClient } from "@prisma/client";
+import { Battery } from "@prisma/client";
 import { IGetAllServicesProps } from "../interfaces/pagination";
 import { getPaginationParameters } from "../utils/pagination";
-import { generateAllBatteriesRes } from "../utils/generateAllBateriesRes";
+import { generateAllBatteriesRes } from "../utils/generateAllBatteriesRes";
 import CreateError from "http-errors";
 import { StatusCodes } from "http-status-codes";
 import { ERROR_BATTERY_REASON } from "../enums/errorMessage/batteryErrorMessage";
+import { Context } from "../../context";
+import { calculateAverageBattery } from "../utils/averageBatteryCalculate";
 
-const prisma = new PrismaClient();
-
-async function findById(id: string) {
-  const battery = await prisma.battery.findUnique({
+async function findById(id: string, ctx: Context) {
+  const battery = await ctx.prisma.battery.findUnique({
     where: {
       id,
     },
@@ -18,19 +18,24 @@ async function findById(id: string) {
     throw new CreateError[StatusCodes.NOT_FOUND](
       ERROR_BATTERY_REASON.NOT_FOUND
     );
-  return battery;
+  return {
+    ...battery,
+    averageWatt: calculateAverageBattery(battery!.totalWatt),
+  };
 }
 
-async function findAll(props: IGetAllServicesProps) {
+async function findAll(props: IGetAllServicesProps, ctx: Context) {
   const { skip, take } = getPaginationParameters({
     pageNumber: props.pageNumber,
     pageSize: props.pageSize,
   });
-  const allBatteries = await prisma.battery.findMany({
+  const allBatteries = await ctx.prisma.battery.findMany({
     orderBy: {
       name: "asc",
     },
-    where: props.filter,
+    where: {
+      AND: props.filters,
+    },
     skip,
     take,
   });
@@ -43,13 +48,20 @@ async function findAll(props: IGetAllServicesProps) {
     allBatteries,
     pageNumber: Number(props.pageNumber),
     pageSize: Number(props.pageSize),
-    totalElements: await prisma.battery.count(),
+    totalElements: await ctx.prisma.battery.count({
+      where: {
+        AND: props.filters,
+      },
+    }),
   });
   return allBatteriesResponse;
 }
 
-async function postMultipleBatteries(batteries: Array<Omit<Battery, "id">>) {
-  const createdBatteries = await prisma.battery.createMany({
+async function postMultipleBatteries(
+  batteries: Array<Omit<Battery, "id">>,
+  ctx: Context
+) {
+  const createdBatteries = await ctx.prisma.battery.createMany({
     data: batteries,
   });
   if (createdBatteries.count === 0)
@@ -59,8 +71,8 @@ async function postMultipleBatteries(batteries: Array<Omit<Battery, "id">>) {
   return createdBatteries;
 }
 
-async function createOne(battery: Omit<Battery, "id">) {
-  const createdBattery = await prisma.battery.create({
+async function createOne(battery: Omit<Battery, "id">, ctx: Context) {
+  const createdBattery = await ctx.prisma.battery.create({
     data: battery,
   });
   if (!createdBattery)
@@ -70,8 +82,8 @@ async function createOne(battery: Omit<Battery, "id">) {
   return createdBattery;
 }
 
-async function deleteById(id: string) {
-  const deletedBattery = await prisma.battery.delete({
+async function deleteById(id: string, ctx: Context) {
+  const deletedBattery = await ctx.prisma.battery.delete({
     where: {
       id,
     },

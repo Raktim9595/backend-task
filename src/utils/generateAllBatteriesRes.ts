@@ -2,7 +2,7 @@ import { Battery } from "@prisma/client";
 import { calculateAverageBattery } from "./averageBatteryCalculate";
 import { IMultipleBatteryResponse } from "../interfaces/battery";
 
-interface Props {
+export interface IGenerateBatteriesResHelper {
   allBatteries: Array<Battery>;
   pageNumber: number;
   pageSize: number;
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function generateAllBatteriesRes(
-  props: Props
+  props: IGenerateBatteriesResHelper
 ): IMultipleBatteryResponse {
   const { allBatteries, pageNumber, pageSize, totalElements } = props;
   const allBatteriesResponse: IMultipleBatteryResponse = {

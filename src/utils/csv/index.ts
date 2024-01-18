@@ -7,6 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import { ERROR_FILE_REASON } from "../../enums/errorMessage/fileErrorMessage";
 
 export const parseCsv = (filePath: string) => {
+  console.log(filePath);
   return new Promise((resolve: (value: any[]) => void, reject) => {
     const results: any[] = [];
     fs.createReadStream(filePath)

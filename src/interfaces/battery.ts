@@ -1,6 +1,6 @@
 import { Battery } from "@prisma/client";
 import { Request } from "express";
-import { IFilter } from "./filters";
+import { IFilter, Operators } from "./filters";
 
 export interface IGetBatteryId extends Request {
   params: {
@@ -20,7 +20,7 @@ export interface IGetAllBatteries extends Request {
   body: {
     pageNumber: number;
     pageSize: number;
-    filter: IFilter<"BETWEEN">;
+    filters: Array<IFilter<Operators>>;
   };
 }
 

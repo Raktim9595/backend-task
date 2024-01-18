@@ -1,12 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 
-import CreateHttpError from "http-errors";
+import createHttpError from "http-errors";
 import { StatusCodes } from "http-status-codes";
 import BatteryService from "../services/battery.services";
-import { calculateAverageBattery } from "../utils/averageBatteryCalculate";
 import { generateFilters } from "../utils/generateFilters";
 import { parseCsv } from "../utils/csv";
-import { prepareBatteryListForPost } from "../helpers/batteryHelpers";
+import {
+  prepareBatteryListForPost,
+  validateBatteryFilters,
+  globalValidationPayload,
+} from "../helpers/batteryHelpers";
 import { ERROR_FILE_REASON } from "../enums/errorMessage/fileErrorMessage";
 import {
   IBatteriesReq,
@@ -18,6 +21,11 @@ import {
   IPostOneBatteryReq,
 } from "interfaces/battery";
 
+import { ctx } from "../../context";
+import { GLOBAL_ERR_MSGS } from "../enums/errorMessage/globalErrorMessage";
+import { ERROR_BATTERY_REASON } from "../enums/errorMessage/batteryErrorMessage";
+import { batteryReqSchema } from "../validationSchemas/batteryReqValidator";
+
 async function getBatteryById(
   req: IGetBatteryId,
   res: Response<IOneBatteryResponse>,
@@ -25,33 +33,45 @@ async function getBatteryById(
 ) {
   try {
     const { id } = req.params;
-    const battery = await BatteryService.findById(id);
-    if (!battery) return;
-    const foundBattery: IOneBatteryResponse = {
-      content: {
-        ...battery,
-        averageWatt: calculateAverageBattery(battery!.totalWatt),
-      },
-    };
-    return res.status(StatusCodes.OK).json(foundBattery);
+    const battery = await BatteryService.findById(id, ctx);
+    return res.status(StatusCodes.OK).json({
+      content: battery,
+    });
   } catch (err) {
     next(err);
   }
 }
 
 async function getallBatteries(
-  req: IGetAllBatteries,
+  req: Partial<IGetAllBatteries>,
   res: Response<IMultipleBatteryResponse>,
   next: NextFunction
 ) {
   try {
-    const filter = generateFilters(req.body.filter);
+    // checking if the req body was uploaded or not
+    if (!req.body?.filters)
+      throw new createHttpError[StatusCodes.BAD_REQUEST](
+        ERROR_BATTERY_REASON.NOT_UPLOADED
+      );
+
+    // validating the filters
+    const isValid = validateBatteryFilters(req.body!.filters);
+    if (!isValid)
+      throw new createHttpError[StatusCodes.BAD_REQUEST](
+        GLOBAL_ERR_MSGS.INVALID_PAYLOAD
+      );
+
+    // generating filters from req body
+    const filters = req.body.filters.map((filter) => generateFilters(filter));
     const { pageNumber, pageSize } = req.body;
-    const batteries = await BatteryService.findAll({
-      filter,
-      pageNumber,
-      pageSize,
-    });
+    const batteries = await BatteryService.findAll(
+      {
+        filters,
+        pageNumber,
+        pageSize,
+      },
+      ctx
+    );
     return res.status(StatusCodes.OK).json(batteries);
   } catch (err) {
     next(err);
@@ -65,8 +85,10 @@ async function postMultipleBatteries(
 ) {
   try {
     const listOfBatteries = req.body;
-    const createdBatteries =
-      await BatteryService.postMultipleBatteries(listOfBatteries);
+    const createdBatteries = await BatteryService.postMultipleBatteries(
+      listOfBatteries,
+      ctx
+    );
     return res.status(StatusCodes.CREATED).json({ createdBatteries });
   } catch (err) {
     next(err);
@@ -76,7 +98,7 @@ async function postMultipleBatteries(
 async function postBatteryCsv(req: Request, res: Response, next: NextFunction) {
   try {
     if (!req.file)
-      throw new CreateHttpError[StatusCodes.BAD_REQUEST](
+      throw new createHttpError[StatusCodes.BAD_REQUEST](
         ERROR_FILE_REASON.EMPTY_FILE
       );
 
@@ -87,7 +109,8 @@ async function postBatteryCsv(req: Request, res: Response, next: NextFunction) {
     const batteriesListForDatabaseAdd = prepareBatteryListForPost(results);
 
     const createdBatteries = await BatteryService.postMultipleBatteries(
-      batteriesListForDatabaseAdd
+      batteriesListForDatabaseAdd,
+      ctx
     );
     res.status(StatusCodes.CREATED).json({
       createdBatteries,
@@ -98,14 +121,19 @@ async function postBatteryCsv(req: Request, res: Response, next: NextFunction) {
 }
 
 async function postOneBattery(
-  req: IPostOneBatteryReq,
+  req: Partial<IPostOneBatteryReq>,
   res: Response,
   next: NextFunction
 ) {
   try {
     const battery = req.body;
-    console.log(battery);
-    const createdBattery = await BatteryService.createOne(battery);
+    // throw error upon empty objects
+    const isValidated = globalValidationPayload(battery!, batteryReqSchema);
+    if (!isValidated)
+      throw new createHttpError[StatusCodes.BAD_REQUEST](
+        GLOBAL_ERR_MSGS.INVALID_PAYLOAD
+      );
+    const createdBattery = await BatteryService.createOne(battery!, ctx);
     return res.status(StatusCodes.CREATED).json({ createdBattery });
   } catch (err) {
     next(err);
@@ -119,7 +147,7 @@ async function deleteById(
 ) {
   try {
     const { id } = req.params;
-    const deletedBattery = await BatteryService.deleteById(id);
+    const deletedBattery = await BatteryService.deleteById(id, ctx);
     return res.status(StatusCodes.OK).json({ deletedBattery });
   } catch (err) {
     next(err);

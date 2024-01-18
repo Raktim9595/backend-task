@@ -1,7 +1,6 @@
 import { Router } from "express";
 import BatteryControllers from "../controllers/battery.controllers";
 import upload from "../utils/multer";
-import BatteryValidatorMiddleware from "../middlewares/batteryValidationMiddleware";
 
 const batteryRouter: Router = Router();
 
@@ -11,11 +10,7 @@ batteryRouter.post("/", BatteryControllers.getallBatteries);
 
 batteryRouter.post("/addMany", BatteryControllers.postMultipleBatteries);
 
-batteryRouter.post(
-  "/add",
-  BatteryValidatorMiddleware.validateOneBatteryReq,
-  BatteryControllers.postOneBattery
-);
+batteryRouter.post("/add", BatteryControllers.postOneBattery);
 
 batteryRouter.delete("/:id", BatteryControllers.deleteById);
 

@@ -4,5 +4,5 @@ export type Pagination = {
 };
 
 export type IGetAllServicesProps = Pagination & {
-  filter: object;
+  filters: Array<object>;
 };
