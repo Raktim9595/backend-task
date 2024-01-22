@@ -1,20 +1,35 @@
-export type Operators = "BETWEEN" | "EQUAL" | "NOT_EQUAL" | "IN";
+export type Operators = "BETWEEN" | "EQUAL" | "NOT_EQUAL" | "CONTAINS";
+
+export enum OPERATORS_ENUM {
+	BETWEEN = "BETWEEN",
+	EQUAL = "EQUAL",
+	NOT_EQUAL = "NOT_EQUAL",
+	IN = "IN",
+	CONTAINS = "CONTAINS",
+}
 
 export interface FilterValueBetween {
-	value_from: string;
-	value_to: string;
+	value_from: number;
+	value_to: number;
 }
 
-// Mapping of operators to their respective value types
-type OperatorValueTypes = {
-	EQUAL: string;
-	NOT_EQUAL: string;
-	IN: string[];
-	BETWEEN: FilterValueBetween;
-};
-
-export interface Filter<T extends Operators> {
+interface IFilterBase {
 	key: string;
-	operator: T;
-	value: OperatorValueTypes[T];
 }
+
+export interface IFilterBetween extends IFilterBase {
+	operator: OPERATORS_ENUM.BETWEEN;
+	value: FilterValueBetween;
+}
+
+export interface IFilterContains extends IFilterBase {
+	operator: OPERATORS_ENUM.CONTAINS;
+	value: string;
+}
+
+export interface IFilterEqual extends IFilterBase {
+	operator: OPERATORS_ENUM.EQUAL;
+	value: string;
+}
+
+export type IFilter = IFilterBetween | IFilterContains | IFilterEqual;

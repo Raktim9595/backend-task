@@ -1,4 +1,5 @@
-import { ThemeProvider, createTheme } from "@mui/material";
+import { CheckCircle, Error } from "@mui/icons-material";
+import { CircularProgress, ThemeProvider, createTheme } from "@mui/material";
 import React from "react";
 
 declare module "@mui/material/styles" {
@@ -71,6 +72,25 @@ const theme = createTheme({
 			styleOverrides: {
 				sizeSmall: {
 					height: "2rem",
+				},
+			},
+		},
+		MuiAlert: {
+			defaultProps: {
+				iconMapping: {
+					success: <CheckCircle color="success" />,
+					error: <Error color="error" />,
+					info: <CircularProgress size={"1rem"} />,
+				},
+			},
+			styleOverrides: {
+				root: {
+					backgroundColor: "#1F1F1F",
+					borderRadius: "0.5rem",
+					color: "#fff",
+					"&.MuiAlert-icon": {
+						color: "#fff",
+					},
 				},
 			},
 		},

@@ -3,3 +3,9 @@ export interface IPagination {
 	pageSize: number;
 	totalElements: number;
 }
+
+export const paginationInitalState: IPagination = {
+	page: 100,
+	pageSize: 20,
+	totalElements: 0,
+};

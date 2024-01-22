@@ -5,5 +5,5 @@ export interface IReactHookFormTextField<TFieldValues extends FieldValues> {
 	name: FieldPath<TFieldValues>;
 	control: Control<TFieldValues>;
 	rules?: RegisterOptions;
-	muiProps?: TextFieldProps;
+	muiProps?: Omit<TextFieldProps, "helperText" | "error">;
 }

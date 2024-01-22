@@ -1,10 +1,4 @@
-import {
-	Control,
-	FieldArrayWithId,
-	FieldErrors,
-	UseFieldArrayAppend,
-	UseFieldArrayRemove,
-} from "react-hook-form";
+import { SnackbarState } from "@/context/snackbar/snackbarContext.types";
 
 export interface IBatteryForm {
 	name: string;
@@ -17,11 +11,20 @@ export interface FormValues {
 }
 
 export interface IBatteryPageViewProps {
-	control: Control<FormValues>;
 	loading: boolean;
 	postBatteriesToDatabase: () => void;
-	append: UseFieldArrayAppend<FormValues, "batteries">;
-	fields: FieldArrayWithId<FormValues, "batteries", "id">[];
-	errors: FieldErrors<FormValues>;
-	remove: UseFieldArrayRemove;
+	changeFileData: (file?: File) => void;
+	file: File | undefined;
+	isSuccess: boolean;
 }
+
+export const postBatterySuccessSnackbarState: Omit<SnackbarState, "open"> = {
+	message: "batteries added successfully",
+	autoTimeOut: false,
+};
+
+export const addBatteryLoadingSnackbarState: Omit<SnackbarState, "open"> = {
+	message: "adding batteries",
+	autoTimeOut: false,
+	variant: "info",
+};

@@ -1,15 +1,21 @@
 import { IRequestParamsType } from "@/components/pages/allBatteriesPage/allBatteriesPage.types";
 import { baseRequest } from "./base";
-import { Operators } from "@/interfaces/filterAndSorts";
 import { IBattery, IBatteryRes } from "@/interfaces/battery";
+import { AxiosResponse } from "axios";
 
-const getAllBatteries = async (body: IRequestParamsType<Operators>): Promise<IBatteryRes> => {
-	return await baseRequest.post("/battery", body);
+export const getAllBatteries = async (body: IRequestParamsType): Promise<IBatteryRes> => {
+	const response: AxiosResponse<IBatteryRes> = await baseRequest.post("/battery", body);
+	return response.data;
 };
 
-const postListOfBatteries = async (body: Omit<IBattery, "averageWatt" | "id">[]) => {
+export const postListOfBatteries = async (body: Omit<IBattery, "averageWatt" | "id">[]) => {
 	return await baseRequest.post("/battery/addMany", body);
 };
 
-const BatteryController = { getAllBatteries, postListOfBatteries };
+export const postBatteryCsv = async (body: FormData) => {
+	const response: AxiosResponse = await baseRequest.post("/battery/file", body);
+	return response.data;
+};
+
+const BatteryController = { getAllBatteries, postListOfBatteries, postBatteryCsv };
 export default BatteryController;

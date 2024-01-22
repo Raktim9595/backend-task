@@ -1,36 +1,34 @@
 import BatteryServices from "@/services/batteries";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { IBatteriesListPage, IRequestParamsType } from "./allBatteriesPage.types";
-import { Filter, Operators } from "@/interfaces/filterAndSorts";
+import {
+	IBatteriesListPage,
+	IRequestParamsType,
+	initialBatteriesRequestParams,
+} from "./allBatteriesPage.types";
+import { IFilter } from "@/interfaces/filterAndSorts";
 import { IBatteryRes } from "@/interfaces/battery";
 import { AxiosError } from "axios";
-import { IPagination } from "@/interfaces/pagination";
+import { IPagination, paginationInitalState } from "@/interfaces/pagination";
 
-export const useAllBatteries = (): IBatteriesListPage => {
-	const [batteryRequestParams, setBatteryRequestParams] = useState<IRequestParamsType<Operators>>({
-		filter: {},
-		pageNumber: 0,
-		pageSize: 10,
-	});
+export const useAllBatteries = () => {
+	const [batteryRequestParams, setBatteryRequestParams] = useState<IRequestParamsType>(
+		initialBatteriesRequestParams,
+	);
 
-	const [paginationState, setPaginationState] = useState<IPagination>({
-		page: 0,
-		pageSize: 10,
-		totalElements: 0,
-	});
+	const [paginationState, setPaginationState] = useState<IPagination>(paginationInitalState);
 
-	const { data: allBatteries, mutate: getAllBatteries } = useMutation<
-		IBatteryRes,
-		AxiosError,
-		IRequestParamsType<Operators>
-	>({
+	const {
+		data: allBatteries,
+		mutate: getBatteries,
+		isSuccess,
+	} = useMutation<IBatteryRes, AxiosError, IRequestParamsType>({
 		mutationFn: (body) => BatteryServices.getAllBatteries(body),
 		onSuccess: (res) => {
 			setPaginationState({
-				page: res.data.pageNumber,
-				pageSize: res.data.pageSize,
-				totalElements: res.data.totalElements,
+				page: res.pageNumber,
+				pageSize: res.pageSize,
+				totalElements: res.totalElements,
 			});
 		},
 	});
@@ -52,22 +50,24 @@ export const useAllBatteries = (): IBatteriesListPage => {
 		}));
 	};
 
-	const changeFilters = (filter: Filter<Operators>) => {
+	const changeFilters = (filter: IFilter) => {
 		setBatteryRequestParams((prev) => ({
 			...prev,
-			filter,
+			filters: [...prev.filters!, filter],
+			pageNumber: 0,
 		}));
 	};
 
 	useEffect(() => {
-		getAllBatteries(batteryRequestParams);
-	}, [batteryRequestParams, getAllBatteries]);
+		getBatteries(batteryRequestParams);
+	}, [batteryRequestParams, getBatteries]);
 
 	return {
-		allBatteries: allBatteries?.data.content,
+		allBatteries: allBatteries?.content,
 		handleChangePage,
 		handleChangeRowsPerPage,
 		pagination: paginationState,
 		changeFilters,
+		isSuccess,
 	};
 };

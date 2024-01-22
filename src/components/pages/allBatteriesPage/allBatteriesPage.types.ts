@@ -1,12 +1,18 @@
 import { IBattery } from "@/interfaces/battery";
-import { Filter, Operators } from "@/interfaces/filterAndSorts";
+import { IFilter } from "@/interfaces/filterAndSorts";
 import { IPagination } from "@/interfaces/pagination";
 
-export interface IRequestParamsType<T extends Operators> {
-	filter?: Filter<T> | object;
+export interface IRequestParamsType {
+	filters?: IFilter[];
 	pageNumber: number;
 	pageSize: number;
 }
+
+export const initialBatteriesRequestParams: IRequestParamsType = {
+	filters: [],
+	pageNumber: 0,
+	pageSize: 20,
+};
 
 export interface IBatteriesListPage {
 	allBatteries?: Array<IBattery>;
@@ -15,5 +21,6 @@ export interface IBatteriesListPage {
 		event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
 	) => void;
 	pagination: IPagination;
-	changeFilters: (filter: Filter<Operators>) => void;
+	changeFilters: (filter: IFilter) => void;
+	isSuccess: boolean;
 }

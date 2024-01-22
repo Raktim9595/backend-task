@@ -24,12 +24,14 @@ const BatteryTable = (props: IBatteryTable) => {
 			</Box>
 			<TablePagination
 				component="div"
-				count={pagination.totalElements}
-				page={pagination.page}
+				count={
+					!pagination.totalElements || pagination.totalElements <= 0 ? 0 : pagination.totalElements
+				}
+				page={pagination.page ?? 0}
 				onPageChange={(_, newPage) => handleChangePage(newPage)}
 				rowsPerPage={pagination.pageSize}
 				onRowsPerPageChange={handleChangeRowsPerPage}
-				rowsPerPageOptions={[2, 4, 6, 8, 10]}
+				rowsPerPageOptions={[5, 10, 15, 20]}
 			/>
 		</Box>
 	);

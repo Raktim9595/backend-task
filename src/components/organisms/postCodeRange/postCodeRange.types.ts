@@ -1,4 +1,4 @@
-import { Filter, Operators } from "@/interfaces/filterAndSorts";
+import { IFilter } from "@/interfaces/filterAndSorts";
 import { SubmitHandler, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
 
 export interface IPostcodeRange {
@@ -13,5 +13,5 @@ export interface IPostcodeRangeHooks {
 }
 
 export interface IPostcodeRangeProps {
-	onFilterClicked: (filter: Filter<Operators>) => void;
+	onFilterClicked: (filter: IFilter) => void;
 }

@@ -9,6 +9,8 @@ import { Box } from "@mui/material";
 // ag grid import done here because I want it to be global and loaded early
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
+import SnackbarProvider from "@/context/snackbar";
+import CustomSnackbar from "@/components/molecules/snackbar";
 
 export default function RootLayout({
 	children,
@@ -20,10 +22,13 @@ export default function RootLayout({
 			<Box component={"body"}>
 				<Theme>
 					<QueryClientSetup>
-						<NavigationBar />
-						<Box component={"section"} sx={{ overflowY: "auto", height: "calc(100vh - 3.5rem)" }}>
-							{children}
-						</Box>
+						<SnackbarProvider>
+							<NavigationBar />
+							<Box component={"section"} sx={{ overflowY: "auto", height: "calc(100vh - 3.5rem)" }}>
+								{children}
+								<CustomSnackbar />
+							</Box>
+						</SnackbarProvider>
 					</QueryClientSetup>
 				</Theme>
 			</Box>
