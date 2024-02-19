@@ -1,8 +1,8 @@
 export type Pagination = {
-  pageNumber: string;
-  pageSize: string;
+  pageNumber: number;
+  pageSize: number;
 };
 
 export type IGetAllServicesProps = Pagination & {
-  filter: object;
+  filters: Array<object>;
 };

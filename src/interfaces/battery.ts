@@ -1,6 +1,6 @@
 import { Battery } from "@prisma/client";
 import { Request } from "express";
-import { Filter } from "./filters";
+import { IFilter, Operators } from "./filters";
 
 export interface IGetBatteryId extends Request {
   params: {
@@ -9,18 +9,18 @@ export interface IGetBatteryId extends Request {
 }
 
 export interface IPostMultipleBatteriesReq extends Request {
-  body: Array<Battery>;
+  body: Array<Omit<Battery, "id">>;
 }
 
 export interface IPostOneBatteryReq extends Request {
-  body: Battery;
+  body: Omit<Battery, "id">;
 }
 
 export interface IGetAllBatteries extends Request {
   body: {
-    pageNumber: string;
-    pageSize: string;
-    filter: Filter;
+    pageNumber: number;
+    pageSize: number;
+    filters: Array<IFilter<Operators>>;
   };
 }
 
@@ -36,4 +36,14 @@ export type IMultipleBatteryResponse = {
       averageWatt: number;
     }
   >;
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  numberOfElementsInPage: number;
 };
+
+export interface IBatteriesReq {
+  name: string;
+  postCode: string;
+  totalWatt: string;
+}

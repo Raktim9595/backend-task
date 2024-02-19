@@ -8,12 +8,12 @@ async function seed() {
       data: [
         {
           name: "battery 1",
-          postCode: "1001",
+          postCode: 1001,
           totalWatt: 100,
         },
         {
           name: "battery 2",
-          postCode: "1002",
+          postCode: 1002,
           totalWatt: 200,
         },
       ],
